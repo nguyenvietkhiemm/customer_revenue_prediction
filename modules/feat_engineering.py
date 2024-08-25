@@ -1,5 +1,7 @@
 from pyspark.sql import functions as F
+import pandas as pd
 from modules.aggregation import *
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType, FloatType, BooleanType, ArrayType, MapType
 ### CREATE MONTH FEATURE
 
 def add_months_to_end(df, months=12):

@@ -147,6 +147,20 @@ def fill_na(df):
     to_true_cols  = ['trafficSource_adwordsClickInfo_isVideoAd']
     to_false_cols = ['trafficSource_isTrueDirect'] 
     
+    # convert to integers
+    to_int = ['customDimensions_index',
+            'totals_bounces',
+            'totals_newVisits',
+            'totals_pageviews',
+            'totals_hits',
+            'totals_sessionQualityDim',
+            'totals_visits',
+            'totals_timeOnSite',
+            'trafficSource_adwordsClickInfo_page',
+            'totals_transactions',
+            'totals_transactionRevenue',
+            'totals_totalTransactionRevenue']
+    
     for col_name, values_to_replace in cols_to_replace.items():
         df = df.replace(to_replace=values_to_replace,
                         value="NA", subset=col_name)
@@ -154,5 +168,13 @@ def fill_na(df):
     df = df.fillna("0", subset=to_0_columns)
     df = df.fillna(True, to_true_cols)
     df = df.fillna(False, to_false_cols)
+    for col_name in to_int :
+        df = df.withColumn(col_name, col(col_name).cast(IntegerType()))
     df = df.withColumn("date", F.to_date(F.col("date"), "yyyyMMdd"))
     return df
+
+def drop_single_value_columns(df):
+    unique_counts = df.agg(*(F.countDistinct(col).alias(col) for col in df.columns)).collect()[0]
+    columns_to_drop = [col for col, count in zip(df.columns, unique_counts) if count == 1]
+    print(columns_to_drop)
+    return df.drop(*columns_to_drop)
