@@ -2,4 +2,4 @@
 /venv
 /dataset
 /kaggle.json
-data
+data/_data.csv
